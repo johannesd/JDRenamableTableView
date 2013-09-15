@@ -1,16 +1,15 @@
 //
-//  RenamableTableView.m
-//  iMIDIPatchbay
+//  JDRenamableTableView.m
 //
 //  Created by Johannes Dörr on 14.09.13.
 //
 //
 
-#import "RenamableTableView.h"
-#import "RenamableTableViewCell.h"
+#import "JDRenamableTableView.h"
+#import "JDRenamableTableViewCell.h"
 
 
-@implementation UIViewController (RenamableTableView)
+@implementation UIViewController (JDRenamableTableView)
 
 - (void)tableView:(UITableView *)aTableView willBeginReorderingRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -20,7 +19,7 @@
 @end
 
 
-@implementation RenamableTableView
+@implementation JDRenamableTableView
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -80,8 +79,8 @@
 - (void)abortRenamingOfAnyCell
 {
     for (UITableViewCell *cell in self.visibleCells) {
-        if ([cell isKindOfClass:RenamableTableViewCell.class]) {
-            [((RenamableTableViewCell*)cell) abortRenaming];
+        if ([cell isKindOfClass:JDRenamableTableViewCell.class]) {
+            [((JDRenamableTableViewCell*)cell) abortRenaming];
         }
     }
 }

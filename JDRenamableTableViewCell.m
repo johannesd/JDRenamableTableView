@@ -1,15 +1,14 @@
 //
-//  RenamableTableViewCell.m
-//  iMIDIPatchbay
+//  JDRenamableTableViewCell.m
 //
 //  Created by Johannes Dörr on 08.09.13.
 //
 //
 
-#import "RenamableTableViewCell.h"
+#import "JDRenamableTableViewCell.h"
 #import "NSObject+OneWayBinding.h"
 
-@implementation RenamableTableViewCell
+@implementation JDRenamableTableViewCell
 
 - (id) initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString*)reuseIdentifier
 {
