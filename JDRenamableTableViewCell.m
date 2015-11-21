@@ -6,18 +6,34 @@
 //
 
 #import "JDRenamableTableViewCell.h"
-#import "NSObject+OneWayBinding.h"
+#import <JDBindings/NSObject+JDOneWayBinding.h>
+#import <JDBindings/NSObject+JDObservation.h>
 
 @implementation JDRenamableTableViewCell
 
-- (id) initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString*)reuseIdentifier
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         textField = [[UITextField alloc] init];
         textField.delegate = self;
         [textField bind:@"font" toObject:self.textLabel withKeyPath:@"font"];
-        [textField bind:@"frame" toObject:self.textLabel withKeyPath:@"frame"];
+        __weak UITextField *weakTextField = textField;
+        __weak JDRenamableTableViewCell *weakSelf = self;
+        [textField bind:@"frame" toObject:self.textLabel withKeyPath:@"frame" withTransform:^id(NSValue *rectValue) {
+            CGRect rect = [rectValue CGRectValue];
+            if (weakTextField.font.pointSize > 20) {
+                rect = CGRectMake(rect.origin.x, rect.origin.y + 2, rect.size.width, rect.size.height - 2);
+            }
+            CGFloat fillableMargin = MIN(rect.origin.y, weakSelf.contentView.bounds.size.height - rect.origin.y - rect.size.height);
+            rect = CGRectMake(rect.origin.x,
+                              rect.origin.y - fillableMargin,
+                              weakSelf.contentView.bounds.size.width - rect.origin.x,
+                              rect.size.height + 2 * fillableMargin);
+            return [NSValue valueWithCGRect:rect];
+        }];
+        [self updateTextColorBinding:TRUE];
+        [self.textLabel observeKeyPath:@"text" withObserver:self withSelector:@selector(textLabelChanged:)];
         textField.hidden = TRUE;
         textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         textField.returnKeyType = UIReturnKeyDone;
@@ -26,69 +42,140 @@
     return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [textField bind:@"font" toObject:nil withKeyPath:nil];
     [textField bind:@"frame" toObject:nil withKeyPath:nil];
+    [self updateTextColorBinding:FALSE];
+    [self.textLabel unobserveKeyPath:@"text" withObserver:self withSelector:@selector(textLabelChanged:)];
 }
 
-- (void) setEditing:(BOOL)editing animated:(BOOL)animated
+- (void)textLabelChanged:(id)sender
 {
-    BOOL wasEditing = self.editing;
-    [super setEditing:editing animated:animated];
-    self.textLabel.hidden = editing;
-    textField.hidden = !editing;
-    if (editing) {
+    textField.text = self.textLabel.text;
+}
+
+- (void)activateRenaming:(BOOL)activate
+{
+    self.textLabel.hidden = activate;
+    textField.hidden = !activate;
+    if (activate) {
         textField.text = self.textLabel.text;
     }
     else {
-        if (wasEditing) {
-            if ([self textFieldShouldEndEditing:textField]) {
-                [textField resignFirstResponder];
+        if (self.renaming) {
+            if (![self textFieldShouldEndEditing:textField]) {
+                [self abortRenaming];
             }
-            else {
-                UITableView *tableView = [self.delegate tableViewForRenamableTableViewCell:self];
-                [tableView performSelector:@selector(setEditing:) withObject:@TRUE afterDelay:0];
-            }
+            [textField resignFirstResponder];
         }
     }
 }
 
-- (void) willTransitionToState:(UITableViewCellStateMask)state
+- (void)activateRenamingIfNecessary
+{
+    BOOL activateRenaming = self.editing && !self.showingDeleteConfirmation;
+    [self activateRenaming:activateRenaming];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
+    [super setEditing:editing animated:animated];
+    [self activateRenamingIfNecessary];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    [super setSelected:selected];
+    [self updateTextColorBinding:TRUE];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
+    [super setSelected:selected animated:animated];
+    [self updateTextColorBinding:TRUE];
+}
+
+- (void)updateTextColorBinding:(BOOL)enable
+{
+    if (enable) {
+        if (self.selected) {
+            [textField bind:@"textColor" toObject:self.textLabel withKeyPath:@"highlightedTextColor"];
+        }
+        else {
+            [textField bind:@"textColor" toObject:self.textLabel withKeyPath:@"textColor"];
+        }
+    }
+    else {
+        [textField bind:@"textColor" toObject:nil withKeyPath:nil];
+    }
+}
+
+- (BOOL)renaming
+{
+    return [textField isFirstResponder];
+}
+
+- (void)willTransitionToState:(UITableViewCellStateMask)state
 {
     [super willTransitionToState:state];
     [self abortRenaming];
 }
 
-- (BOOL) textFieldShouldEndEditing:(UITextField*)aTextField
+- (BOOL)shouldEndRenaming
 {
     return [self.delegate renamableTableViewCell:self shouldRenameTo:textField.text];
 }
 
-- (void) textFieldDidBeginEditing:(UITextField *)textField
+- (BOOL)textFieldShouldEndEditing:(UITextField *)aTextField
+{
+    return [self shouldEndRenaming];
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     [self.delegate renamableTableViewCellDidBeginRenaming:self];
 }
 
-- (void) textFieldDidEndEditing:(UITextField*)aTextField
+- (void)textFieldDidEndEditing:(UITextField *)aTextField
 {
-    [self.delegate renamableTableViewCell:self wasRenamedTo:textField.text];
+    if (![textField.text isEqualToString:self.textLabel.text]) {
+        [self.delegate renamableTableViewCell:self wasRenamedTo:textField.text];
+    }
+    // If only this cell but not the whole table is being edited, renaming
+    // has to be turned off:
+    [self performSelector:@selector(activateRenamingIfNecessary) withObject:nil afterDelay:0];
 }
 
-- (BOOL) textFieldShouldReturn:(UITextField *)aTextField
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    // Necessary on iOS7
+    return !self.showingDeleteConfirmation;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)aTextField
 {
     [textField resignFirstResponder];
     return FALSE;
 }
 
-- (void) startRenaming
+- (void)startRenaming
 {
     if (!textField.isFirstResponder) {
+        self.editing = FALSE;
+        [self activateRenaming:TRUE];
         [textField becomeFirstResponder];
     }
 }
 
-- (void) abortRenaming
+- (void)endRenaming
+{
+    if (textField.isFirstResponder) {
+        [textField resignFirstResponder];
+    }
+}
+
+- (void)abortRenaming
 {
     if (textField.isFirstResponder) {
         textField.text = self.textLabel.text;

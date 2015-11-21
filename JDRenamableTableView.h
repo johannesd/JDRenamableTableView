@@ -5,13 +5,18 @@
 //
 //
 
-#import "TPKeyboardAvoidingTableView.h"
+#import <TPKeyboardAvoiding/TPKeyboardAvoidingTableView.h>
 
 @interface JDRenamableTableView : TPKeyboardAvoidingTableView <UITableViewDelegate>
 {
-    NSObject<UITableViewDelegate> *userDelegate;
+    __weak NSObject<UITableViewDelegate> *userDelegate;
 }
 
+@property (nonatomic, assign, readonly) BOOL goballyEditing;
+
+- (void)endRenamingOfAnyCell;
 - (void)abortRenamingOfAnyCell;
+- (BOOL)shouldEndEditing;
+- (NSIndexPath *)indexPathForRenamingCell;
 
 @end

@@ -11,10 +11,9 @@
 
 @protocol JDRenamableTableViewCellDelegate <NSObject>
 
-- (BOOL) renamableTableViewCell:(JDRenamableTableViewCell*)cell shouldRenameTo:(NSString*)name;
-- (void) renamableTableViewCell:(JDRenamableTableViewCell*)cell wasRenamedTo:(NSString*)name;
-- (void) renamableTableViewCellDidBeginRenaming:(JDRenamableTableViewCell*)cell;
-- (UITableView*) tableViewForRenamableTableViewCell:(JDRenamableTableViewCell*)cell;
+- (BOOL)renamableTableViewCell:(JDRenamableTableViewCell *)cell shouldRenameTo:(NSString *)name;
+- (void)renamableTableViewCell:(JDRenamableTableViewCell *)cell wasRenamedTo:(NSString *)name;
+- (void)renamableTableViewCellDidBeginRenaming:(JDRenamableTableViewCell *)cell;
 
 @end
 
@@ -25,8 +24,12 @@
 }
 
 @property (nonatomic, weak) id<JDRenamableTableViewCellDelegate> delegate;
+@property (nonatomic, assign, readonly) BOOL renaming;
 
-- (void) startRenaming;
-- (void) abortRenaming;
+- (void)startRenaming;
+- (void)endRenaming;
+- (void)abortRenaming;
+- (BOOL)shouldEndRenaming;
+- (void)activateRenaming:(BOOL)activate;
 
 @end
