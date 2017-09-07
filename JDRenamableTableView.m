@@ -106,26 +106,26 @@
     }
 }
 
-//- (void)tableView:(UITableView *)tableView didEndReorderingRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    if ([userDelegate respondsToSelector:@selector(tableView:didEndReorderingRowAtIndexPath:)]) {
-//        [userDelegate performSelector:@selector(tableView:didEndReorderingRowAtIndexPath:) withObject:tableView withObject:indexPath];
-//    }
-//}
-//
-//- (void)tableView:(UITableView *)tableView didCancelReorderingRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    if ([userDelegate respondsToSelector:@selector(tableView:didCancelReorderingRowAtIndexPath:)]) {
-//        [userDelegate performSelector:@selector(tableView:didCancelReorderingRowAtIndexPath:) withObject:tableView withObject:indexPath];
-//    }
-//}
+- (void)tableView:(UITableView *)tableView didEndReorderingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([userDelegate respondsToSelector:@selector(tableView:didEndReorderingRowAtIndexPath:)]) {
+        [userDelegate performSelector:@selector(tableView:didEndReorderingRowAtIndexPath:) withObject:tableView withObject:indexPath];
+    }
+}
 
-//- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    if ([userDelegate respondsToSelector:@selector(tableView:willDisplayCell:forRowAtIndexPath:)]) {
-//        [userDelegate performSelector:@selector(tableView:willDisplayCell:forRowAtIndexPath:) withObject:tableView withObject:indexPath];
-//    }
-//}
+- (void)tableView:(UITableView *)tableView didCancelReorderingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([userDelegate respondsToSelector:@selector(tableView:didCancelReorderingRowAtIndexPath:)]) {
+        [userDelegate performSelector:@selector(tableView:didCancelReorderingRowAtIndexPath:) withObject:tableView withObject:indexPath];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([userDelegate respondsToSelector:@selector(tableView:willDisplayCell:forRowAtIndexPath:)]) {
+        [userDelegate performSelector:@selector(tableView:willDisplayCell:forRowAtIndexPath:) withObject:tableView withObject:indexPath];
+    }
+}
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

@@ -15,6 +15,9 @@
 - (void)renamableTableViewCell:(JDRenamableTableViewCell *)cell wasRenamedTo:(NSString *)name;
 - (void)renamableTableViewCellDidBeginRenaming:(JDRenamableTableViewCell *)cell;
 
+@optional
+- (void)renamableTableViewCellCancelledRenaming:(JDRenamableTableViewCell *)cell;
+
 @end
 
 

@@ -124,7 +124,7 @@
 
 - (BOOL)shouldEndRenaming
 {
-    return [self.delegate renamableTableViewCell:self shouldRenameTo:textField.text];
+    return self.delegate == nil || [self.delegate renamableTableViewCell:self shouldRenameTo:textField.text];
 }
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)aTextField
@@ -141,6 +141,11 @@
 {
     if (![textField.text isEqualToString:self.textLabel.text]) {
         [self.delegate renamableTableViewCell:self wasRenamedTo:textField.text];
+    }
+    else {
+        if ([self.delegate respondsToSelector:@selector(renamableTableViewCellCancelledRenaming:)]) {
+            [self.delegate renamableTableViewCellCancelledRenaming:self];
+        }
     }
     // If only this cell but not the whole table is being edited, renaming
     // has to be turned off:
