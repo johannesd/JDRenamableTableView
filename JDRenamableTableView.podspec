@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "JDRenamableTableView"
-  s.version      = "0.1.0"
+  s.version      = "0.1.1"
   s.summary      = "A TableView which allows the user to rename its elements."
 
   s.description  = <<-DESC
@@ -79,7 +79,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/johannesd/JDRenamableTableView.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/johannesd/JDRenamableTableView.git", :tag => "0.1.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -132,7 +132,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   # s.xcconfig = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
-  s.dependency 'JDBindings', '~> 0.0.1'
+  s.dependency 'JDBindings'
   s.dependency 'TPKeyboardAvoiding'
 
 end
