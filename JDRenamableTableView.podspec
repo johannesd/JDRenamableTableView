@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "JDRenamableTableView"
-  s.version      = "0.0.1"
+  s.version      = "0.1.0"
   s.summary      = "A TableView which allows the user to rename its elements."
 
   s.description  = <<-DESC
